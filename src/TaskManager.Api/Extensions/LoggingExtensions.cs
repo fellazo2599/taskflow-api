@@ -1,5 +1,7 @@
 using Serilog;
+using Serilog.Events;
 using Serilog.Formatting.Compact;
+using TaskManager.Api.Constants;
 
 namespace TaskManager.Api.Extensions;
 
@@ -24,4 +26,21 @@ public static class LoggingExtensions
             else
                 logger.WriteTo.Console(new RenderedCompactJsonFormatter());
         });
+
+    // One line per request. Successful health probes are dropped to Verbose so they don't flood the logs.
+    public static WebApplication UseApiRequestLogging(this WebApplication app)
+    {
+        app.UseSerilogRequestLogging(options => options.GetLevel = RequestLogLevel);
+        return app;
+    }
+
+    private static LogEventLevel RequestLogLevel(HttpContext httpContext, double elapsedMilliseconds, Exception? exception)
+    {
+        if (exception is not null || httpContext.Response.StatusCode >= StatusCodes.Status500InternalServerError)
+            return LogEventLevel.Error;
+
+        return httpContext.Request.Path.StartsWithSegments(HealthEndpoints.BasePath)
+            ? LogEventLevel.Verbose
+            : LogEventLevel.Information;
+    }
 }
