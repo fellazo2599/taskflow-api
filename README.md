@@ -318,6 +318,19 @@ El pipeline HTTP, en orden:
 
 ---
 
+## Tiempo invertido
+
+En total, unas **1 h 10 min**, medidas con la hora de creación del proyecto y las horas de los commits:
+
+| Fase | Tiempo |
+|---|---|
+| Planificación: dominio, reglas de negocio, arquitectura y convenciones | ~20 min |
+| Implementación base: capas, CRUD, filtros, paginación, errores, seguridad, tests y README | ~15 min |
+| Revisión de extremo a extremo, correcciones, logs, health checks, Docker, CI y renombrado | ~25 min |
+| Verificación final (CI en GitHub) y publicación | ~10 min |
+
+---
+
 ## Cómo usé la IA
 
 Usé **Claude Code** (Claude Opus) como asistente de programación en la terminal. Trabajé con él como con un compañero al que le doy contexto y le reviso el trabajo, no como generador automático.
