@@ -1,14 +1,19 @@
+using TaskManager.Api.Extensions;
+using TaskManager.Application;
 using TaskManager.Infrastructure;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Persistence.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration)
+    .AddApi();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
