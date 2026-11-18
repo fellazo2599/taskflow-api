@@ -6,7 +6,7 @@ namespace TaskManager.Application.Tasks.Interfaces;
 
 public interface ITaskService
 {
-    Task<PagedResult<TaskVm>> ListAsync(PaginationRm pagination, CancellationToken cancellationToken);
+    Task<PagedResult<TaskVm>> ListAsync(FilterTasksRm filter, CancellationToken cancellationToken);
     Task<TaskVm> GetByIdAsync(long id, CancellationToken cancellationToken);
     Task<TaskVm> CreateAsync(CreateTaskRm request, CancellationToken cancellationToken);
     Task<TaskVm> UpdateAsync(long id, UpdateTaskRm request, CancellationToken cancellationToken);

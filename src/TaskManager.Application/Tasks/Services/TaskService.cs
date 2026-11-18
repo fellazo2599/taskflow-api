@@ -13,16 +13,16 @@ namespace TaskManager.Application.Tasks.Services;
 
 public sealed class TaskService(
     ITaskRepository taskRepository,
-    IValidator<PaginationRm> paginationValidator,
+    IValidator<FilterTasksRm> filterValidator,
     IValidator<CreateTaskRm> createValidator,
     IValidator<UpdateTaskRm> updateValidator,
     ILogger<TaskService> logger) : ITaskService
 {
-    public async Task<PagedResult<TaskVm>> ListAsync(PaginationRm pagination, CancellationToken cancellationToken)
+    public async Task<PagedResult<TaskVm>> ListAsync(FilterTasksRm filter, CancellationToken cancellationToken)
     {
-        await paginationValidator.ValidateAndThrowAsync(pagination, cancellationToken);
+        await filterValidator.ValidateAndThrowAsync(filter, cancellationToken);
 
-        var tasks = await taskRepository.ListAsync(pagination, cancellationToken);
+        var tasks = await taskRepository.ListAsync(filter, cancellationToken);
         return tasks.Map(task => task.ToVm());
     }
 
