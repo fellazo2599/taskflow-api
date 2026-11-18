@@ -16,8 +16,8 @@ public sealed class TasksController(ITaskService taskService) : ControllerBase
     [HttpGet]
     [ProducesResponseType<PagedResult<TaskVm>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ErrorResponse>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> List([FromQuery] PaginationRm pagination, CancellationToken cancellationToken)
-        => Ok(await taskService.ListAsync(pagination, cancellationToken));
+    public async Task<IActionResult> List([FromQuery] FilterTasksRm filter, CancellationToken cancellationToken)
+        => Ok(await taskService.ListAsync(filter, cancellationToken));
 
     [HttpGet("{id:long}")]
     [ProducesResponseType<TaskVm>(StatusCodes.Status200OK)]
