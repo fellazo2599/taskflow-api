@@ -1,36 +1,38 @@
 # Local environment. `docker compose up -d --build` runs PostgreSQL and the API;
 # `docker compose up -d postgres` runs only the database for `dotnet run`.
+name: taskflow
+
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: taskmanager-postgres
+    container_name: taskflow-postgres
     environment:
-      POSTGRES_DB: taskmanager
-      POSTGRES_USER: taskmanager
-      POSTGRES_PASSWORD: taskmanager
+      POSTGRES_DB: taskflow
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: taskflow
     # Host port 5433 avoids clashing with a local PostgreSQL on 5432.
     ports:
       - "5433:5432"
     volumes:
-      - taskmanager-data:/var/lib/postgresql/data
+      - taskflow-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taskmanager -d taskmanager"]
+      test: ["CMD-SHELL", "pg_isready -U taskflow -d taskflow"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   api:
     build: .
-    container_name: taskmanager-api
+    container_name: taskflow-api
     depends_on:
       postgres:
         condition: service_healthy
     # Development enables Swagger UI and applies migrations at startup; meant for local use only.
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__Default: Host=postgres;Port=5432;Database=taskmanager;Username=taskmanager;Password=taskmanager
+      ConnectionStrings__Default: Host=postgres;Port=5432;Database=taskflow;Username=taskflow;Password=taskflow
     ports:
       - "8080:8080"
 
 volumes:
-  taskmanager-data:
+  taskflow-data:
