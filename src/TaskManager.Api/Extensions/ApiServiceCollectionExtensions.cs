@@ -18,7 +18,7 @@ public static class ApiServiceCollectionExtensions
                 // FluentValidation is the only validation mechanism; skip MVC's implicit [Required].
                 options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
             })
-            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(EnumNamesOnly()))
             .ConfigureApiBehaviorOptions(options =>
             {
                 options.InvalidModelStateResponseFactory = context =>
@@ -27,9 +27,12 @@ public static class ApiServiceCollectionExtensions
 
         // The OpenAPI generator reads these options, not MVC's, so enums must be strings here too.
         services.ConfigureHttpJsonOptions(options =>
-            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            options.SerializerOptions.Converters.Add(EnumNamesOnly()));
         services.AddOpenApi();
 
         return services;
     }
+
+    // Enums travel as names ("InProgress"); numbers are rejected so the contract matches the docs.
+    private static JsonStringEnumConverter EnumNamesOnly() => new(namingPolicy: null, allowIntegerValues: false);
 }

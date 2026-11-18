@@ -44,10 +44,12 @@ public class TasksApiTests(TaskManagerApiFactory factory) : IClassFixture<TaskMa
         await AssertErrorAsync(response, HttpStatusCode.BadRequest, "TITLE_REQUIRED");
     }
 
-    [Fact]
-    public async Task Post_UnknownStatus_Returns400WithStatusInvalid()
+    [Theory]
+    [InlineData("\"Archived\"")]
+    [InlineData("1")]
+    public async Task Post_UnknownOrNumericStatus_Returns400WithStatusInvalid(string status)
     {
-        var body = $$"""{ "title": "Task", "assignee": "Ana", "dueDate": "{{Today.AddDays(1):yyyy-MM-dd}}", "status": "Archived" }""";
+        var body = $$"""{ "title": "Task", "assignee": "Ana", "dueDate": "{{Today.AddDays(1):yyyy-MM-dd}}", "status": {{status}} }""";
 
         var response = await _client.PostAsync(TasksUrl, new StringContent(body, Encoding.UTF8, "application/json"));
 
