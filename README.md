@@ -1,4 +1,4 @@
-# TaskManager API
+# TaskFlow API
 
 API REST para gestionar tareas, hecha con ASP.NET Core 10 y PostgreSQL.
 
@@ -21,12 +21,12 @@ Cada tarea tiene título, descripción, estado (`Pending`, `InProgress`, `Done`)
 docker compose up -d
 ```
 
-Esto levanta PostgreSQL 16 en `localhost:5433`, con base, usuario y contraseña `taskmanager`. Uso el puerto 5433 para no chocar con un Postgres local que esté en el 5432.
+Esto levanta PostgreSQL 16 en `localhost:5433`, con base, usuario y contraseña `taskflow`. Uso el puerto 5433 para no chocar con un Postgres local que esté en el 5432.
 
 ### 2. Arrancar la API
 
 ```bash
-dotnet run --project src/TaskManager.Api
+dotnet run --project src/TaskFlow.Api
 ```
 
 En `Development` la API **aplica las migraciones pendientes al arrancar** (`Database:ApplyMigrationsOnStartup`). Cuando arranca:
@@ -49,14 +49,14 @@ Los tests no necesitan Docker ni Postgres: los de integración usan SQLite en me
 ```bash
 dotnet tool restore
 dotnet tool run dotnet-ef database update \
-  --project src/TaskManager.Infrastructure --startup-project src/TaskManager.Api
+  --project src/TaskFlow.Infrastructure --startup-project src/TaskFlow.Api
 ```
 
 Para crear una migración nueva:
 
 ```bash
 dotnet tool run dotnet-ef migrations add <Nombre> \
-  --project src/TaskManager.Infrastructure --startup-project src/TaskManager.Api \
+  --project src/TaskFlow.Infrastructure --startup-project src/TaskFlow.Api \
   --output-dir Persistence/Migrations
 ```
 
@@ -65,8 +65,8 @@ dotnet tool run dotnet-ef migrations add <Nombre> \
 Apunta la connection string a cualquier PostgreSQL con una variable de entorno:
 
 ```bash
-ConnectionStrings__Default="Host=localhost;Port=5432;Database=taskmanager;Username=<user>;Password=<pass>" \
-  dotnet run --project src/TaskManager.Api
+ConnectionStrings__Default="Host=localhost;Port=5432;Database=taskflow;Username=<user>;Password=<pass>" \
+  dotnet run --project src/TaskFlow.Api
 ```
 
 ---
@@ -159,14 +159,14 @@ Los errores de validación siguen el formato `CAMPO_REGLA`. Si hay varios campos
 
 ```
 src/
-  TaskManager.Domain/          Entidades y reglas puras: TaskItem, TaskState, BaseEntity, límites de campos
-  TaskManager.Application/     Casos de uso: TaskService, Rm/Vm, validators, adapters,
+  TaskFlow.Domain/          Entidades y reglas puras: TaskItem, TaskState, BaseEntity, límites de campos
+  TaskFlow.Application/     Casos de uso: TaskService, Rm/Vm, validators, adapters,
                                ITaskRepository, ErrorCodes, NotFoundException
-  TaskManager.Infrastructure/  EF Core: AppDbContext, configuraciones, interceptores,
+  TaskFlow.Infrastructure/  EF Core: AppDbContext, configuraciones, interceptores,
                                TaskRepository, migraciones
-  TaskManager.Api/             Controllers, manejo de errores, middlewares, CORS, rate limiting, Program.cs
+  TaskFlow.Api/             Controllers, manejo de errores, middlewares, CORS, rate limiting, Program.cs
 tests/
-  TaskManager.Tests/           Unit/ (validators, service, errores) + Integration/ (API completa)
+  TaskFlow.Tests/           Unit/ (validators, service, errores) + Integration/ (API completa)
 ```
 
 Las dependencias van así: `Api → Application → Domain ← Infrastructure` (y `Api → Infrastructure` solo para registrar el DI). Application no conoce EF Core ni HTTP.

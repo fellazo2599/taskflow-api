@@ -4,14 +4,14 @@ WORKDIR /src
 
 # Restore first, using only the project files, so the layer is cached until a dependency changes.
 COPY global.json Directory.Build.props Directory.Packages.props ./
-COPY src/TaskManager.Domain/TaskManager.Domain.csproj src/TaskManager.Domain/
-COPY src/TaskManager.Application/TaskManager.Application.csproj src/TaskManager.Application/
-COPY src/TaskManager.Infrastructure/TaskManager.Infrastructure.csproj src/TaskManager.Infrastructure/
-COPY src/TaskManager.Api/TaskManager.Api.csproj src/TaskManager.Api/
-RUN dotnet restore src/TaskManager.Api/TaskManager.Api.csproj
+COPY src/TaskFlow.Domain/TaskFlow.Domain.csproj src/TaskFlow.Domain/
+COPY src/TaskFlow.Application/TaskFlow.Application.csproj src/TaskFlow.Application/
+COPY src/TaskFlow.Infrastructure/TaskFlow.Infrastructure.csproj src/TaskFlow.Infrastructure/
+COPY src/TaskFlow.Api/TaskFlow.Api.csproj src/TaskFlow.Api/
+RUN dotnet restore src/TaskFlow.Api/TaskFlow.Api.csproj
 
 COPY src/ src/
-RUN dotnet publish src/TaskManager.Api/TaskManager.Api.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish src/TaskFlow.Api/TaskFlow.Api.csproj -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
@@ -22,4 +22,4 @@ USER $APP_UID
 ENV ASPNETCORE_HTTP_PORTS=8080
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "TaskManager.Api.dll"]
+ENTRYPOINT ["dotnet", "TaskFlow.Api.dll"]
