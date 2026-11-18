@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using FluentValidation;
+using FluentValidation.Validators;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TaskManager.Application.Common.Constants;
 
@@ -36,11 +37,12 @@ public static partial class ErrorResponseAdapter
     private static string ToFieldCode(string propertyName)
         => WordBoundary().Replace(propertyName, "_").ToUpperInvariant();
 
+    // FluentValidation uses the validator's type name as the default error code.
     private static string ToRuleCode(string validatorErrorCode) => validatorErrorCode switch
     {
-        "NotNullValidator" or "NotEmptyValidator" => FieldErrorCodes.Required,
-        "MaximumLengthValidator" => FieldErrorCodes.TooLong,
-        "GreaterThanOrEqualValidator" or "InclusiveBetweenValidator" => FieldErrorCodes.OutOfRange,
+        nameof(NotNullValidator<,>) or nameof(NotEmptyValidator<,>) => FieldErrorCodes.Required,
+        nameof(MaximumLengthValidator<>) => FieldErrorCodes.TooLong,
+        nameof(InclusiveBetweenValidator<,>) => FieldErrorCodes.OutOfRange,
         FieldErrorCodes.InPast => FieldErrorCodes.InPast,
         _ => FieldErrorCodes.Invalid
     };
