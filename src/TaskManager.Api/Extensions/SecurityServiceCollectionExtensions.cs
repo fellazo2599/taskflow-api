@@ -48,12 +48,19 @@ public static class SecurityServiceCollectionExtensions
 
     private static async ValueTask OnRejectedAsync(OnRejectedContext context, CancellationToken cancellationToken)
     {
+        var httpContext = context.HttpContext;
+        httpContext.RequestServices.GetRequiredService<ILoggerFactory>()
+            .CreateLogger(typeof(SecurityServiceCollectionExtensions))
+            .LogWarning("Rate limit exceeded for {ClientIp} on {Method} {Path}",
+                httpContext.Connection.RemoteIpAddress?.ToString() ?? UnknownClientPartition,
+                httpContext.Request.Method, httpContext.Request.Path);
+
         if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
         {
-            context.HttpContext.Response.Headers.RetryAfter =
+            httpContext.Response.Headers.RetryAfter =
                 ((int)retryAfter.TotalSeconds).ToString(CultureInfo.InvariantCulture);
         }
 
-        await context.HttpContext.Response.WriteAsJsonAsync(new ErrorResponse(ErrorCodes.TooManyRequests), cancellationToken);
+        await httpContext.Response.WriteAsJsonAsync(new ErrorResponse(ErrorCodes.TooManyRequests), cancellationToken);
     }
 }

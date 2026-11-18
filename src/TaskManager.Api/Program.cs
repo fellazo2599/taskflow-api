@@ -1,3 +1,4 @@
+using Serilog;
 using TaskManager.Api.Constants;
 using TaskManager.Api.Extensions;
 using TaskManager.Api.Middlewares;
@@ -16,6 +17,7 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 
 builder.Services
+    .AddApiLogging(builder.Configuration, builder.Environment)
     .AddApplication()
     .AddInfrastructure(builder.Configuration)
     .AddApi()
@@ -23,6 +25,8 @@ builder.Services
 
 var app = builder.Build();
 
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 
 if (!app.Environment.IsDevelopment())
