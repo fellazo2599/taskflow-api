@@ -28,6 +28,11 @@ public static partial class ErrorResponseAdapter
             : $"{ToFieldCode(field)}_{FieldErrorCodes.Invalid}");
     }
 
+    public static ErrorResponse ToErrorResponse(this BadHttpRequestException exception)
+        => new(exception.StatusCode == StatusCodes.Status413PayloadTooLarge
+            ? ErrorCodes.PayloadTooLarge
+            : ErrorCodes.InvalidRequest);
+
     private static string ToFieldCode(string propertyName)
         => WordBoundary().Replace(propertyName, "_").ToUpperInvariant();
 

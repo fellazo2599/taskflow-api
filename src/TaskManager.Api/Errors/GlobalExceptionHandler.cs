@@ -16,6 +16,8 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             ValidationException validation => (StatusCodes.Status400BadRequest, validation.ToErrorResponse()),
             NotFoundException notFound => (StatusCodes.Status404NotFound, new ErrorResponse(notFound.Code)),
+            // Raised by Kestrel while reading the request, e.g. a body over the size limit (413).
+            BadHttpRequestException badRequest => (badRequest.StatusCode, badRequest.ToErrorResponse()),
             _ => (StatusCodes.Status500InternalServerError, new ErrorResponse(ErrorCodes.ServerError))
         };
 
