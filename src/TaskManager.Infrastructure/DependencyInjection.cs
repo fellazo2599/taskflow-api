@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaskManager.Application.Tasks.Interfaces;
+using TaskManager.Infrastructure.HealthChecks;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Persistence.Interceptors;
 using TaskManager.Infrastructure.Persistence.Repositories;
@@ -25,6 +26,9 @@ public static class DependencyInjection
                 serviceProvider.GetRequiredService<AuditableEntityInterceptor>()));
 
         services.AddScoped<ITaskRepository, TaskRepository>();
+
+        services.AddHealthChecks()
+            .AddDbContextCheck<AppDbContext>(HealthCheckNames.Database, tags: [HealthCheckTags.Ready]);
 
         return services;
     }

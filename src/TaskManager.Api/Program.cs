@@ -1,4 +1,3 @@
-using Serilog;
 using TaskManager.Api.Constants;
 using TaskManager.Api.Extensions;
 using TaskManager.Api.Middlewares;
@@ -26,7 +25,7 @@ builder.Services
 var app = builder.Build();
 
 app.UseMiddleware<CorrelationIdMiddleware>();
-app.UseSerilogRequestLogging();
+app.UseApiRequestLogging();
 app.UseExceptionHandler();
 
 if (!app.Environment.IsDevelopment())
@@ -46,6 +45,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(CorsSettings.PolicyName);
 app.UseRateLimiter();
 app.MapControllers();
+app.MapApiHealthChecks();
 
 var databaseSettings = app.Configuration.GetSection(DatabaseSettings.SectionName).Get<DatabaseSettings>();
 if (databaseSettings?.ApplyMigrationsOnStartup == true)
