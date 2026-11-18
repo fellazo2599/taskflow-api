@@ -1,4 +1,5 @@
 using TaskManager.Api.Extensions;
+using TaskManager.Api.Middlewares;
 using TaskManager.Api.Settings;
 using TaskManager.Application;
 using TaskManager.Infrastructure;
@@ -6,6 +7,8 @@ using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Persistence.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 builder.Services
     .AddApplication()
@@ -17,14 +20,22 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "TaskManager API v1"));
 }
 
-app.UseHttpsRedirection();
 app.UseCors(CorsSettings.PolicyName);
+app.UseRateLimiter();
 app.MapControllers();
 
 var databaseSettings = app.Configuration.GetSection(DatabaseSettings.SectionName).Get<DatabaseSettings>();
