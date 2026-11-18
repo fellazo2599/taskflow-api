@@ -2,8 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TaskManager.Application.Tasks.Interfaces;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Persistence.Interceptors;
+using TaskManager.Infrastructure.Persistence.Repositories;
 
 namespace TaskManager.Infrastructure;
 
@@ -21,6 +23,8 @@ public static class DependencyInjection
             .AddInterceptors(
                 serviceProvider.GetRequiredService<SoftDeleteInterceptor>(),
                 serviceProvider.GetRequiredService<AuditableEntityInterceptor>()));
+
+        services.AddScoped<ITaskRepository, TaskRepository>();
 
         return services;
     }
