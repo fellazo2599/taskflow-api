@@ -1,3 +1,4 @@
+using TaskManager.Api.Constants;
 using TaskManager.Api.Extensions;
 using TaskManager.Api.Middlewares;
 using TaskManager.Api.Settings;
@@ -8,7 +9,11 @@ using TaskManager.Infrastructure.Persistence.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.AddServerHeader = false;
+    options.Limits.MaxRequestBodySize = RequestLimits.MaxBodySizeBytes;
+});
 
 builder.Services
     .AddApplication()

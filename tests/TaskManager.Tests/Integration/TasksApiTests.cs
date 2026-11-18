@@ -44,10 +44,12 @@ public class TasksApiTests(TaskManagerApiFactory factory) : IClassFixture<TaskMa
         await AssertErrorAsync(response, HttpStatusCode.BadRequest, "TITLE_REQUIRED");
     }
 
-    [Fact]
-    public async Task Post_UnknownStatus_Returns400WithStatusInvalid()
+    [Theory]
+    [InlineData("\"Archived\"")]
+    [InlineData("1")]
+    public async Task Post_UnknownOrNumericStatus_Returns400WithStatusInvalid(string status)
     {
-        var body = $$"""{ "title": "Task", "assignee": "Ana", "dueDate": "{{Today.AddDays(1):yyyy-MM-dd}}", "status": "Archived" }""";
+        var body = $$"""{ "title": "Task", "assignee": "Ana", "dueDate": "{{Today.AddDays(1):yyyy-MM-dd}}", "status": {{status}} }""";
 
         var response = await _client.PostAsync(TasksUrl, new StringContent(body, Encoding.UTF8, "application/json"));
 
@@ -109,12 +111,14 @@ public class TasksApiTests(TaskManagerApiFactory factory) : IClassFixture<TaskMa
         Assert.Equal("Second pending", task.Title);
     }
 
-    [Fact]
-    public async Task List_PageSizeOverLimit_Returns400()
+    [Theory]
+    [InlineData("pageSize=1000", "PAGE_SIZE_OUT_OF_RANGE")]
+    [InlineData("page=2147483647", "PAGE_OUT_OF_RANGE")]
+    public async Task List_PaginationOutOfRange_Returns400(string query, string code)
     {
-        var response = await _client.GetAsync($"{TasksUrl}?pageSize=1000");
+        var response = await _client.GetAsync($"{TasksUrl}?{query}");
 
-        await AssertErrorAsync(response, HttpStatusCode.BadRequest, "PAGE_SIZE_OUT_OF_RANGE");
+        await AssertErrorAsync(response, HttpStatusCode.BadRequest, code);
     }
 
     [Fact]

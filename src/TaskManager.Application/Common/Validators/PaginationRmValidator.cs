@@ -7,7 +7,7 @@ public sealed class PaginationRmValidator : AbstractValidator<PaginationRm>
 {
     public PaginationRmValidator()
     {
-        RuleFor(pagination => pagination.Page).GreaterThanOrEqualTo(1);
+        RuleFor(pagination => pagination.Page).InclusiveBetween(1, PaginationRm.MaxPage);
         RuleFor(pagination => pagination.PageSize).InclusiveBetween(1, PaginationRm.MaxPageSize);
     }
 }

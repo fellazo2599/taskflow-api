@@ -15,10 +15,12 @@ public class FilterTasksRmValidatorTests
         _validator.TestValidate(new FilterTasksRm()).ShouldNotHaveAnyValidationErrors();
     }
 
-    [Fact]
-    public void PageBelowOne_IsInvalid()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(int.MaxValue)]
+    public void PageOutsideLimits_IsInvalid(int page)
     {
-        _validator.TestValidate(new FilterTasksRm { Page = 0 })
+        _validator.TestValidate(new FilterTasksRm { Page = page })
             .ShouldHaveValidationErrorFor(filter => filter.Page);
     }
 
